@@ -7,10 +7,6 @@ framework:
 
     #esi: true
     #fragments: true
-    
-    exceptions:
-        Fasano\PHPrimitives\Exception\InvalidBackingValue:
-            status_code: 422
 
 when@test:
     framework:

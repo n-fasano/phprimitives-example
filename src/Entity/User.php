@@ -3,7 +3,9 @@
 namespace App\Entity;
 
 use App\Domain\Email;
+use App\Domain\Name;
 use App\Infrastructure\EmailType;
+use App\Infrastructure\NameType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
@@ -21,9 +23,13 @@ class User
     #[ORM\Column(type: EmailType::NAME, length: 255)]
     public readonly Email $email;
 
-    public function __construct(Email $email)
+    #[ORM\Column(type: NameType::NAME, length: 255)]
+    public readonly Name $name;
+
+    public function __construct(Email $email, Name $name)
     {
         $this->id = Uuid::v4();
         $this->email = $email;
+        $this->name = $name;
     }
 }

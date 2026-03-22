@@ -18,7 +18,7 @@ class CreateUser extends AbstractController
 
     public function __invoke(#[MapRequestPayload] CreateUserDto $data): JsonResponse
     {
-        $user = new User($data->email);
+        $user = new User($data->email, $data->name);
 
         $this->users->save($user);
 

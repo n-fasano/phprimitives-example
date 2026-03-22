@@ -78,44 +78,50 @@ cd public && php -S localhost:8080
 # Create a user
 curl -X POST http://localhost:8080/users \
   -H "Content-Type: application/json" \
-  -d '{"email": "john@example.com"}'
+  -d '{"email": "john@example.com", "name": "John Doe"}'
 
 # List users
 curl http://localhost:8080/users
+```
 
+## Error Handling
+
+Invalid primitive values are automatically rejected with a `422 Unprocessable Content`. No controller-level error handling is needed - `#[MapRequestPayload]` and `PrimitiveDenormalizer` handle this together.
+
+### Example
+```bash
 # Invalid input - fails directly
 curl -X POST http://localhost:8080/users \
   -H "Content-Type: application/json" \
-  -d '{"email": "not-an-email"}'
+  -d '{"email": "not-an-email", "name": ""}'
 ```
-
-## Error handling
-
-When an invalid value is submitted, an exception can be thrown during deserialization -
-before your controller code runs. Out of the box this produces a 500, so you'll want to map it
-to something more appropriate.
-
-**Quick option** - map it to a 422 in `config/packages/framework.yaml`:
-```yaml
-framework:
-    exceptions:
-        Fasano\PHPrimitives\Exception\InvalidBackingValue: # or your custom exception class
-            status_code: 422
-```
-
-**Custom response** - if you need control over the response format (JSON body, XML, a redirect,
-etc.), register a `kernel.exception` listener:
-```php
-#[AsEventListener(event: KernelEvents::EXCEPTION)]
-class InvalidBackingValueListener
+```json
 {
-    public function __invoke(ExceptionEvent $event): void
-    {
-        if (!$event->getThrowable() instanceof InvalidBackingValue) {
-            return;
+    "type": "https://symfony.com/errors/validation",
+    "title": "Validation Failed",
+    "status": 422,
+    "detail": "email: This value should be of type string.\nname: This value should be of type string.",
+    "violations": [
+        {
+            "propertyPath": "email",
+            "title": "This value should be of type string.",
+            "template": "This value should be of type {{ type }}.",
+            "parameters": {
+                "{{ type }}": "string"
+            },
+            "hint": "Invalid email address: not-an-email"
+        },
+        {
+            "propertyPath": "name",
+            "title": "This value should be of type string.",
+            "template": "This value should be of type {{ type }}.",
+            "parameters": {
+                "{{ type }}": "string"
+            },
+            "hint": "Name must be at least 5 characters long."
         }
-
-        $event->setResponse(/* whatever makes sense for your app */);
-    }
+    ]
 }
 ```
+
+The violation message is forwarded from the `InvalidArgumentException` thrown in your primitive's `validate()` method. No glue code required.
