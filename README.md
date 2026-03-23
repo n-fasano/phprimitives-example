@@ -1,6 +1,6 @@
 # PHPrimitives - Example App
 
-A minimal Symfony API demonstrating that **you never have to touch a raw scalar again** - not in
+A minimal Symfony project using [PHPrimitives](https://github.com/n-fasano/phprimitives) demonstrating that **you never have to touch a raw scalar again** - not in
 your controllers, not in your entities, not in your DTOs. From the moment data enters your
 application to the moment it leaves, every value is a typed domain primitive.
 
